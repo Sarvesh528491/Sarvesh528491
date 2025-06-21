@@ -29,18 +29,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Get Started Button
     const getStartedBtn = document.getElementById('get-started');
-    getStartedBtn.addEventListener('click', () => {
-        // For now, just scroll to chatbot card
-        const chatbotCard = document.getElementById('chatbot-card');
-        chatbotCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        // Optionally, show an alert
-        // alert('Get Started functionality coming soon!');
-    });
-
-    // Chatbot Button Logic Stub
     const chatbotCard = document.getElementById('chatbot-card');
-    chatbotCard.addEventListener('click', () => {
-        // Placeholder for future chatbot integration
-        alert('Chatbot feature coming soon!');
-    });
+    function openChatbaseWidget() {
+        // Try to open Chatbase widget if available
+        if (window.Chatbase && typeof window.Chatbase.openChat === 'function') {
+            window.Chatbase.openChat();
+        } else {
+            // Try to click the Chatbase launcher button if present
+            const chatbaseLauncher = document.querySelector('div[style*="chatbase"] button, .chatbase-launcher, .cb-launcher, button[aria-label*="chat"]');
+            if (chatbaseLauncher) {
+                chatbaseLauncher.click();
+                return;
+            }
+            // Try to trigger the widget via DOM event
+            const chatbaseFrame = document.getElementById('c0RxreJVYMwVtPKnLvDpw');
+            if (chatbaseFrame && chatbaseFrame.contentWindow) {
+                chatbaseFrame.contentWindow.postMessage({type: 'open'}, '*');
+                return;
+            }
+            // Fallback: try to click the widget iframe if it exists
+            const chatbaseWidget = document.querySelector('iframe[src*="chatbase.co"]');
+            if (chatbaseWidget) {
+                chatbaseWidget.contentWindow.postMessage({type: 'open'}, '*');
+            }
+        }
+    }
+    getStartedBtn.addEventListener('click', openChatbaseWidget);
+    chatbotCard.addEventListener('click', openChatbaseWidget);
 }); 
